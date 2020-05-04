@@ -27,6 +27,7 @@
   "author": "Naoki Nishiyama",
   "module": "dist/mutableurl.esm.js",
   "devDependencies": {
+    "eslint-plugin-prettier": "^3.1.3",
     "husky": "^4.2.5",
     "prettier": "^2.0.5",
     "tsdx": "^0.13.2",

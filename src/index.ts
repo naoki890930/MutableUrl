@@ -1,48 +1,50 @@
-export default class MutableUrl {
-  private _hash: string = "";
-  private _hostname: string = "";
-  private _pathname: string = "";
-  private _port: string = "";
-  private _protocol: string = "";
-  private _search: string = "";
+import { Origin, Query } from "./type";
 
-  get hash() {
+export default class MutableUrl {
+  private _hash = "";
+  private _hostname = "";
+  private _pathname = "";
+  private _port = "";
+  private _protocol = "";
+  private _search = "";
+
+  get hash(): string {
     return this._hash;
   }
-  get hostname() {
+  get hostname(): string {
     return this._hostname;
   }
-  get pathname() {
+  get pathname(): string {
     return this._pathname;
   }
-  get port() {
+  get port(): string {
     return this._port;
   }
-  get protocol() {
+  get protocol(): string {
     return this._protocol;
   }
-  get search() {
+  get search(): string {
     return this._search;
   }
-  get searchObject() {
+  get searchObject(): { [key: string]: string } {
     return this._parseSearch(this._search);
   }
-  get host() {
+  get host(): string {
     return (
       (this._hostname && this._hostname) + (this._port && `:${this._port}`)
     );
   }
-  get origin() {
+  get origin(): string {
     return (
       (this._protocol && `${this._protocol}//`) +
       (this._hostname && this._hostname) +
       (this._port && `:${this._port}`)
     );
   }
-  get href() {
+  get href(): string {
     return this.toString();
   }
-  get pathArray() {
+  get pathArray(): string[] {
     return this._pathname.split("/").filter((path) => path !== "");
   }
 
@@ -63,7 +65,7 @@ export default class MutableUrl {
     this._pathname = origin.pathname;
   }
 
-  private _parseSearch(searchString: string) {
+  private _parseSearch(searchString: string): { [key: string]: string } {
     const obj: { [key: string]: string } = {};
     searchString.split("&").forEach((s) => {
       const keyValue = s.split("=");
@@ -73,13 +75,13 @@ export default class MutableUrl {
     return obj;
   }
 
-  private _stringifySearch(searchObject: { [key: string]: string }) {
+  private _stringifySearch(searchObject: { [key: string]: string }): string {
     return Object.keys(searchObject)
       .map((key) => `${key}=${searchObject[key]}`)
       .join("&");
   }
 
-  private _setLocation(location: Location) {
+  private _setLocation(location: Location): void {
     this._protocol = location.protocol;
     this._hostname = location.hostname;
     this._port = location.port;
@@ -88,8 +90,8 @@ export default class MutableUrl {
     this._hash = location.hash;
   }
 
-  public static parseQuery(url: string) {
-    const result = {
+  public static parseQuery(url: string): Query & { other: string } {
+    const result: Query = {
       search: "",
       hash: "",
     };
@@ -117,8 +119,8 @@ export default class MutableUrl {
     return { ...result, other: urls[0] };
   }
 
-  public static parseOrigin(origin: string) {
-    const result = {
+  public static parseOrigin(origin: string): Origin {
+    const result: Origin = {
       protocol: "",
       port: "",
       hostname: "",
@@ -150,20 +152,20 @@ export default class MutableUrl {
     return result;
   }
 
-  public setSearch(arg: { [key: string]: string } | string) {
+  public setSearch(arg: { [key: string]: string } | string): void {
     const newSearchObject =
       typeof arg === "string" ? this._parseSearch(arg) : arg;
     this._search = this._stringifySearch(newSearchObject);
   }
 
-  public mergeSearch(arg: { [key: string]: string } | string) {
+  public mergeSearch(arg: { [key: string]: string } | string): void {
     const current = this.searchObject;
     const next = typeof arg === "string" ? this._parseSearch(arg) : arg;
     const newSearchObject = { ...current, ...next };
     this._search = this._stringifySearch(newSearchObject);
   }
 
-  public deleteSearch(key: string | string[]) {
+  public deleteSearch(key: string | string[]): void {
     const searchObject = this.searchObject;
     if (typeof key === "string") {
       if (key in searchObject) delete searchObject[key];
@@ -175,18 +177,18 @@ export default class MutableUrl {
     this._search = this._stringifySearch(searchObject);
   }
 
-  public setHash(arg: string) {
+  public setHash(arg: string): void {
     this._hash = arg;
   }
 
-  public setOrigin(origin: string) {
+  public setOrigin(origin: string): void {
     const result = MutableUrl.parseOrigin(origin);
     this._protocol = result.protocol;
     this._hostname = result.hostname;
     this._port = result.port;
   }
 
-  public setPathname(pathname: string | string[]) {
+  public setPathname(pathname: string | string[]): void {
     if (typeof pathname === "string") {
       this._pathname = pathname;
       return;
@@ -196,7 +198,7 @@ export default class MutableUrl {
     this._pathname = tmp ? "/" + tmp : "";
   }
 
-  public toString() {
+  public toString(): string {
     return (
       (this._protocol && `${this._protocol}//`) +
       (this._hostname && this._hostname) +
@@ -207,7 +209,7 @@ export default class MutableUrl {
     );
   }
 
-  public format(format: string) {
+  public format(format: string): string {
     return format
       .replace("{protocol}", this.protocol)
       .replace("{origin}", this.origin)
